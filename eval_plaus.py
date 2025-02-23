@@ -64,7 +64,7 @@ def main():
        help="noiser, attention, attention_last, attention_rollout, gradient_shap,\
              input_x_gradient, integrated_gradients, lime, reagent, occlusion")  
     aa("--openai_api_key", type=str, default=None)
-    aa("--topk", type=int, default=3)
+    aa("--topk", type=int, default=50)
     
     args = parser.parse_args()
 
@@ -106,7 +106,7 @@ def main():
     print(f"Filtered dataset to {len(dataset)} examples")
 
     nltk.download('punkt_tab')
-    
+
     if args.method == 'noiser':
         from importance_score_evaluator.noiser import  NoiserImportanceScoreEvaluator
         rationalizer = NoiserImportanceScoreEvaluator(
@@ -142,7 +142,7 @@ def main():
     INSTRUCTION = (
         "# Task:\n"
         "Given a set of words extracted from a prompt for a completion task, "
-        "return a single word as the most probable completion for the unseen "
+        "return top 5 words as the most probable completions for the unseen "
         "prompt without any explanation."
     )
 
@@ -152,8 +152,11 @@ def main():
         "Probable Completion: "
     )
     
-    answerability_rates = 0
-    answerability_scores = []
+    answ_top1_rate = 0
+    answ_top1_score = []
+
+    answ_top5_rate = 0
+    answ_top5_score = []
     print("Starting rationalization ...")
 
     samples = dataset if args.n_samples == -1 else random.choices(dataset, k=args.n_samples)
@@ -179,10 +182,11 @@ def main():
             rationalizer.rationalize(input_ids, target_id)
             scores = rationalizer.mean_important_score.unsqueeze(0).to(device)
 
-            tokens = nltk.word_tokenize(data["prompt"])
+            input_text = tokenizer.decode(input_ids.squeeze(), skip_special_tokens=True)
+            tokens = nltk.word_tokenize(input_text)
             tokens = ['"' if token in ['``', "''"] else token for token in tokens]
-            tokens = check_whitespace(data["prompt"], tokens)
-            tokens_range = collect_token_range(mt, data["prompt"], tokens)            
+            tokens = check_whitespace(input_text, tokens)
+            tokens_range = collect_token_range(tokenizer, input_text, tokens)            
             scores = match_tokens_with_scores(scores.squeeze(), tokens_range)
 
             k = args.topk * len(tokens) // 100
@@ -198,11 +202,20 @@ def main():
             )
 
             prediction = response.choices[0].message.content
-            if prediction == data["target"]:
-                answerability_rates += 1
-                answerability_scores.append(torch.sum(topk_scores).item())
+            prediction = [word.strip(" '") for word in prediction.split(",")]
+
+            if prediction[0] == data["target"]:
+                answ_top1_rate += 1
+                answ_top1_score.append(torch.sum(topk_scores).item())
             else:
-                answerability_scores.append(0)
+                answ_top1_score.append(0.0)
+
+            
+            if data["target"] in prediction:
+                answ_top5_rate += 1
+                answ_top5_score.append(torch.sum(topk_scores).item())
+            else:
+                answ_top5_score.append(0.0)
 
             # # compute metrics on Soft-NS and Soft-NC
             # print(f"Prompt: {data['prompt']}")
@@ -210,9 +223,13 @@ def main():
             # print(f"scores: {topk_scores}")
             # print(f'GPT prediction: {prediction}')
             # print("-"*10)
-    print(f"Rate: {answerability_rates/len(samples)}")
-    print(f"Score: {torch.mean(torch.tensor(answerability_scores, dtype=torch.float16)).item()}")
+    print(f"Rate: {answ_top1_rate/len(samples)}")
+    print(f"Score: {torch.mean(torch.tensor(answ_top1_score, dtype=torch.float16)).item()}")
+    print()
+    print(f"Rate: {answ_top5_rate/len(samples)}")
+    print(f"Score: {torch.mean(torch.tensor(answ_top5_score, dtype=torch.float16)).item()}")
     
+
 
 
 if __name__ == "__main__":
