@@ -74,7 +74,8 @@ def main():
 
     cache_dir = f"cache/{args.model_name}"
     os.makedirs(cache_dir, exist_ok=True)
-
+    print(os.getenv("OPENAI_API_KEY"),'-'*10)
+    print(os.getenv("HF_TOKEN"),'-'*10)
     login(os.getenv("HF_TOKEN"))
     print('Loading model and tokenizer ...')
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
