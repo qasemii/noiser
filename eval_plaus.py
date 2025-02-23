@@ -105,8 +105,9 @@ def main():
     ]
     print(f"Filtered dataset to {len(dataset)} examples")
 
+    nltk.download('punkt_tab')
+    
     if args.method == 'noiser':
-        nltk.download('punkt_tab')
         from importance_score_evaluator.noiser import  NoiserImportanceScoreEvaluator
         rationalizer = NoiserImportanceScoreEvaluator(
             model=model,
