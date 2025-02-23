@@ -130,6 +130,14 @@ def collect_token_range(tokenizer, prompt, tokens):
 
     return ranges
 
+def match_tokens_with_scores(scores, ranges):
+    test = []
+
+    for b, e in ranges:
+        word_score = torch.sum(scores[b:e])
+        test.append(word_score)
+    return torch.tensor(test)
+
 def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
     # Use single prompt instead of 11
     device = model.device
