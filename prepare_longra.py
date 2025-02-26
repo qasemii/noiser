@@ -73,6 +73,7 @@ with torch.no_grad():
                 "prompt": prompt,
                 "target": word_a,
                 "relative": word_b,
+                "type": analogy_label
             })
             data_id += 1
 
