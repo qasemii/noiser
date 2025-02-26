@@ -13,9 +13,6 @@ parser.add_argument("--analogies-file", type=str, default="data/analogies.txt", 
 parser.add_argument("--output-dir", type=str, default="data/analogies", help="")  # TODO
 parser.add_argument("--compact-output", type=bool, default=True, help="")  # TODO
 parser.add_argument("--schema-uri", type=str, default="../../docs/analogy.schema.json", help="")  # TODO
-parser.add_argument("--device", type=str, default="cuda", help="")  # TODO
-
-parser.add_argument("--model", type=str, default="gpt2-medium", help="")  # TODO # gpt2-medium gpt2-large
 parser.add_argument("--cache_dir", type=str, default=None, help="store models")
 args = parser.parse_args()
 
@@ -33,15 +30,9 @@ analogies = [line.rstrip("\n") for line in analogies]
 # print("00".center(50, "-"))
 # print(f"==>> analogies: {analogies}")
 
-# Load model
-
-tokenizer = AutoTokenizer.from_pretrained(args.model, cache_dir=args.cache_dir)
-model = AutoModelForCausalLM.from_pretrained(args.model, cache_dir=args.cache_dir)
-model.to(device)
-
 with torch.no_grad():
     # Build analogies index
-    all_analogies = preprocess_analogies(analogies, tokenizer)
+    all_analogies = preprocess_analogies(analogies)
     all_analogies = create_analogy_templates(all_analogies)
 
     # Build data

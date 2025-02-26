@@ -79,7 +79,7 @@ def create_analogy_templates(all_analogies):
     return all_analogies
 
 
-def preprocess_analogies(analogies, tokenizer):
+def preprocess_analogies(analogies):
     """Preprocess analogies by creating a dict containing all pairs.
 
     Args:
