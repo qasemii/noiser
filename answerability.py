@@ -136,7 +136,8 @@ def main():
 
 
     client = OpenAI(
-            api_key = args.openai_api_key or os.getenv("OPENAI_API_KEY")
+            api_key = args.openai_api_key or os.getenv("OPENAI_API_KEY"),
+            base_url="https://api.together.xyz/v1",
         )
     
     INSTRUCTION = (
