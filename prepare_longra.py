@@ -20,10 +20,8 @@ analogies_file = args.analogies_file
 output_dir = args.output_dir
 compact_output = args.compact_output
 schema_uri = args.schema_uri
-device = args.device
 
 # Load analogies
-
 with open(analogies_file) as f:
     analogies = f.readlines()
 analogies = [line.rstrip("\n") for line in analogies]
