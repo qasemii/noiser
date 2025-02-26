@@ -4,6 +4,7 @@ import torch
 import random
 import nltk
 import pickle
+import json
 import re
 from tqdm import tqdm
 from pathlib import Path
@@ -93,8 +94,8 @@ def main():
     elif args.dataset == "Counterfact":
         dataset = CounterFactDataset(DATA_DIR)
     elif args.dataset == "LongRA":
-        # dataset = CounterFactDataset(DATA_DIR)
-        pass
+        with open("/content/noiser/data/LongRA.json", "r") as f:
+            dataset = json.load(f)
     else:
         raise ValueError
     
