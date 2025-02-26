@@ -4,6 +4,7 @@ import torch
 import random
 import nltk
 import pickle
+import re
 from tqdm import tqdm
 from pathlib import Path
 from openai import OpenAI
@@ -196,14 +197,18 @@ def main():
             topk_scores = torch.gather(scores, 0, topk_indices)
 
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 messages=[{"role": "system", "content": INSTRUCTION},
                           {"role": "user",  "content": PROMPT.format(tokens=topk_words)}],
                 temperature=0.0
             )
 
             prediction = response.choices[0].message.content
-            prediction = [word.strip(" '") for word in prediction.split(",")]
+
+            # Uncomment the following if using GPT-4o
+            # prediction = [word.strip(" '") for word in prediction.split(",")]
+            # Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
+            prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
             if prediction[0] == data["target"]:
                 answ_top1_rate += 1
