@@ -141,11 +141,18 @@ def main():
             base_url="https://api.together.xyz/v1",
         )
     
+    # INSTRUCTION = (
+    #     "# Task:\n"
+    #     "Given a set of words extracted from a prompt for a completion task, "
+    #     "return top 5 words as the most probable completions for the unseen "
+    #     "prompt without any explanation."
+    # )
+
     INSTRUCTION = (
         "# Task:\n"
         "Given a set of words extracted from a prompt for a completion task, "
-        "return top 5 words as the most probable completions for the unseen "
-        "prompt without any explanation."
+        "return only the list of top 5 words as the most probable completions for the unseen "
+        "prompt WITHOUT any explanation."
     )
 
 
@@ -205,9 +212,9 @@ def main():
 
             prediction = response.choices[0].message.content
 
-            # Uncomment the following if using GPT-4o
+            ## Uncomment the following if using GPT-4o
             # prediction = [word.strip(" '") for word in prediction.split(",")]
-            # Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
+            ## Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
             prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
             if prediction[0] == data["target"]:
