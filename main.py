@@ -85,7 +85,7 @@ def main():
     elif args.dataset == "Counterfact":
         dataset = CounterFactDataset(DATA_DIR)
     elif args.dataset == "LongRA":
-        with open("/content/noiser/data/LongRA.json", "r") as f:
+        with open("/data/LongRA.json", "r") as f:
             dataset = json.load(f)
     else:
         raise ValueError
