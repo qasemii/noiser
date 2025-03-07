@@ -90,10 +90,7 @@ def main():
     elif args.dataset == "wikitext":
         with open(Path(__file__).parent/"data/wikitext.txt", "r") as f:
             wikitext = f.read().splitlines()
-        dataset = {}
-        for i, t in enumerate(wikitext):
-            dataset[i] = {}
-            dataset[i]['prompt'] = t 
+        dataset = [{'prompt': t} for t in wikitext]
     else:
         raise ValueError
     
