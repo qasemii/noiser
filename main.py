@@ -180,17 +180,17 @@ def main():
 
             # compute Soft-NS and Soft-NC on source importance score
             s_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, scores)
-            s_soft_ns.append(s_soft_ns_step)
+            s_soft_ns.append(s_soft_ns_step.item())
 
             s_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, scores)
-            s_soft_nc.append(s_soft_nc_step)
+            s_soft_nc.append(s_soft_nc_step.item())
 
             # compute Soft-NS and Soft-NC on random importance score
             r_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, random_score)
-            r_soft_ns.append(r_soft_ns_step)
+            r_soft_ns.append(r_soft_ns_step.item())
 
             r_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, random_score)
-            r_soft_nc.append(r_soft_nc_step)
+            r_soft_nc.append(r_soft_nc_step.item())
 
         # # compute metrics on Soft-NS and Soft-NC
         # soft_ns = torch.log(torch.sum(torch.tensor(source_soft_ns)) / torch.sum(torch.tensor(random_soft_ns)))
