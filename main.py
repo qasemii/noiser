@@ -87,6 +87,9 @@ def main():
     elif args.dataset == "LongRA":
         with open(Path(__file__).parent/"data/LongRA.json", "r") as f:
             dataset = json.load(f)
+    elif args.dataset == "wikitext":
+        with open(Path(__file__).parent/"data/wikitext.txt", "r") as f:
+            input_text_list = f.read().splitlines()
     else:
         raise ValueError
     
