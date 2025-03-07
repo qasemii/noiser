@@ -89,7 +89,11 @@ def main():
             dataset = json.load(f)
     elif args.dataset == "wikitext":
         with open(Path(__file__).parent/"data/wikitext.txt", "r") as f:
-            dataset = f.read().splitlines()
+            wikitext = f.read().splitlines()
+        dataset = {}
+        for i, t in enumerate(wikitext):
+            dataset[i] = {}
+            dataset[i]['prompt'] = t 
     else:
         raise ValueError
     
@@ -142,7 +146,7 @@ def main():
     print("Starting rationalization ...")
     samples = dataset if args.n_samples == -1 else random.choices(dataset, k=args.n_samples)
     for data in tqdm(samples):
-        idx = data['id']
+        # idx = data['id']
 
         input_ids = tokenizer(data["prompt"], return_tensors='pt')['input_ids'][0].to(device)
         attention_mask = tokenizer(data["prompt"], return_tensors='pt')['attention_mask'][0].to(device)
@@ -152,7 +156,7 @@ def main():
                                        max_new_tokens=args.max_new_tokens, 
                                        do_sample=False)[0]
         
-        target_id = tokenizer(" "+data["target"], return_tensors='pt')['input_ids'][0].to(device)
+        # target_id = tokenizer(" "+data["target"], return_tensors='pt')['input_ids'][0].to(device)
         # generated_texts = tokenizer.decode(generated_ids)
         # print(f'generated full sequence --> {generated_texts}')
 
@@ -162,7 +166,7 @@ def main():
         r_soft_nc = []
 
         score_map = torch.zeros([generated_ids.shape[0] - input_ids.shape[0], generated_ids.shape[0] - 1], device=device)
-        for target_pos in torch.arange(input_ids.shape[0], generated_ids.shape[0]):
+        for target_pos in tqdm(torch.arange(input_ids.shape[0], generated_ids.shape[0])):
             input_ids = torch.unsqueeze(generated_ids[:target_pos], 0)
             target_id = torch.unsqueeze(generated_ids[target_pos], 0)
 
