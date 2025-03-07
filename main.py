@@ -94,11 +94,12 @@ def main():
         raise ValueError
     
     # Filter dataset to only include examples where the predicted token matches the target
-    print(f"Filtering dataset ...")
-    dataset = [
-        d for d in dataset
-        if predict_token(model, tokenizer, d['prompt']).strip() == d['target']
-    ]
+    if args.dataset in ['Knowns', 'Counterfact', 'LongRA']:
+        print(f"Filtering dataset ...")
+        dataset = [
+            d for d in dataset
+            if predict_token(model, tokenizer, d['prompt']).strip() == d['target']
+        ]
     print(f"Filtered dataset to {len(dataset)} examples")
 
     if args.method == 'noiser':
