@@ -43,6 +43,7 @@ def make_noisy_embeddings(
 
     bounds = {'1': lambda d: np.sqrt(2/np.pi) * d, 
               '2': lambda d: np.sqrt(d), 
+              '3': lambda d: (4*d/np.sqrt(np.pi))**(1/3),
               'inf': lambda d: np.sqrt(2 * np.log(d)), 
               'None': lambda d: 1}
     bound = bounds.get(norm, lambda _: ValueError(f'Unknown norm: {norm}'))
