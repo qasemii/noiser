@@ -185,7 +185,7 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
                 high = k
         k_list.append(k)
 
-    min_k = min(k)
+    min_k = min(k_list)
     print(min_k)
     for t_range in tokens_range:
         with torch.no_grad():
