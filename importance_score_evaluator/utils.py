@@ -164,18 +164,34 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
 
     # Initialize on correct device
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
-    norms = ["1", "2", "3", "4", "inf", "None"]
+
+    k_list = []
     for t_range in tokens_range:
         b, e = t_range
-        prob_list = []
-        for norm in norms:  # with 10 iteration the precision would be 2e-10 ~= 0.001
-            k = 1 #(low + high) / 2
+        high = 1.0
+        low = 0.0
+        for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
+            k = (low + high) / 2
             with torch.no_grad():
                 low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
             prob = low_scores[answer_id].item()
-            prob_list.append(prob)
-            
-        score = base_score - min(prob_list)
+
+            sorted_indices = torch.argsort(low_scores, descending=True)
+            rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
+
+            if rank == 0:
+                low = k
+            else:
+                high = k
+        k_list.append(k)
+
+    min_k = min(k)
+    print(min_k)
+    for t_range in tokens_range:
+        with torch.no_grad():
+            low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
+        prob = low_scores[answer_id].item()
+        score = base_score - prob
 
         # Assign score to all subword tokens in the range
         tokens_score[b:e] = score
