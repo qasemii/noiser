@@ -188,6 +188,7 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
     min_k = min(k_list)
     print(min_k)
     for t_range in tokens_range:
+        b, e = t_range
         with torch.no_grad():
             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
         prob = low_scores[answer_id].item()
@@ -196,7 +197,7 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
         # Assign score to all subword tokens in the range
         tokens_score[b:e] = score
 
-    tokens_score = tokens_score - torch.min(tokens_score)
+    # tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     # Aggregate word scores by averaging sub-tokens scores
