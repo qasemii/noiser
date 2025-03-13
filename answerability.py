@@ -219,19 +219,22 @@ def main():
             ## Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
             prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
-            # Top-1
-            if prediction[0] == data["target"]:
-                answ_top1_rate += 1
-                answ_top1_score.append(torch.sum(topk_scores).item())
-            else:
-                answ_top1_score.append(0.0)
+            try:
+                # Top-1
+                if prediction[0] == data["target"]:
+                    answ_top1_rate += 1
+                    answ_top1_score.append(torch.sum(topk_scores).item())
+                else:
+                    answ_top1_score.append(0.0)
 
-            # Top-5
-            if data["target"] in prediction:
-                answ_top5_rate += 1
-                answ_top5_score.append(torch.sum(topk_scores).item())
-            else:
-                answ_top5_score.append(0.0)
+                # Top-5
+                if data["target"] in prediction:
+                    answ_top5_rate += 1
+                    answ_top5_score.append(torch.sum(topk_scores).item())
+                else:
+                    answ_top5_score.append(0.0)
+            except:
+                pass
 
             # # compute metrics on Soft-NS and Soft-NC
             # print(f"Prompt: {data['prompt']}")
