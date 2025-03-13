@@ -162,45 +162,48 @@ def main():
         r_soft_ns = []
         r_soft_nc = []
 
-        score_map = torch.zeros([generated_ids.shape[0] - input_ids.shape[0], generated_ids.shape[0] - 1], device=device)
-        for target_pos in tqdm(torch.arange(input_ids.shape[0], generated_ids.shape[0])):
-            input_ids = torch.unsqueeze(generated_ids[:target_pos], 0)
-            target_id = torch.unsqueeze(generated_ids[target_pos], 0)
+        try:
+            score_map = torch.zeros([generated_ids.shape[0] - input_ids.shape[0], generated_ids.shape[0] - 1], device=device)
+            for target_pos in tqdm(torch.arange(input_ids.shape[0], generated_ids.shape[0])):
+                input_ids = torch.unsqueeze(generated_ids[:target_pos], 0)
+                target_id = torch.unsqueeze(generated_ids[target_pos], 0)
 
-            # rationalization
-            rationalizer.rationalize(input_ids, target_id)
-            scores = rationalizer.mean_important_score.unsqueeze(0).to(device)
-            # if args.method=='occlusion':
-            #     scores = scores/torch.sum(scores)
+                # rationalization
+                rationalizer.rationalize(input_ids, target_id)
+                scores = rationalizer.mean_important_score.unsqueeze(0).to(device)
+                # if args.method=='occlusion':
+                #     scores = scores/torch.sum(scores)
 
-            random_score = torch.softmax(torch.rand(scores.shape, device=device), dim=-1)
+                random_score = torch.softmax(torch.rand(scores.shape, device=device), dim=-1)
 
-            # compute Soft-NS and Soft-NC on source importance score
-            s_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, scores)
-            s_soft_ns.append(s_soft_ns_step.item())
+                # compute Soft-NS and Soft-NC on source importance score
+                s_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, scores)
+                s_soft_ns.append(s_soft_ns_step.item())
 
-            s_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, scores)
-            s_soft_nc.append(s_soft_nc_step.item())
+                s_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, scores)
+                s_soft_nc.append(s_soft_nc_step.item())
 
-            # compute Soft-NS and Soft-NC on random importance score
-            r_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, random_score)
-            r_soft_ns.append(r_soft_ns_step.item())
+                # compute Soft-NS and Soft-NC on random importance score
+                r_soft_ns_step = soft_norm_suff_evaluator.evaluate(input_ids, target_id, random_score)
+                r_soft_ns.append(r_soft_ns_step.item())
 
-            r_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, random_score)
-            r_soft_nc.append(r_soft_nc_step.item())
+                r_soft_nc_step = soft_norm_comp_evaluator.evaluate(input_ids, target_id, random_score)
+                r_soft_nc.append(r_soft_nc_step.item())
 
-        # # compute metrics on Soft-NS and Soft-NC
-        # soft_ns = torch.log(torch.sum(torch.tensor(source_soft_ns)) / torch.sum(torch.tensor(random_soft_ns)))
-        # n_soft_ns.append(soft_ns.item())
+            # # compute metrics on Soft-NS and Soft-NC
+            # soft_ns = torch.log(torch.sum(torch.tensor(source_soft_ns)) / torch.sum(torch.tensor(random_soft_ns)))
+            # n_soft_ns.append(soft_ns.item())
 
-        # soft_nc = torch.log(torch.sum(torch.tensor(source_soft_nc)) / torch.sum(torch.tensor(random_soft_nc)))
-        # n_soft_nc.append(soft_nc.item())
+            # soft_nc = torch.log(torch.sum(torch.tensor(source_soft_nc)) / torch.sum(torch.tensor(random_soft_nc)))
+            # n_soft_nc.append(soft_nc.item())
 
-        source_soft_ns.append(torch.mean(torch.tensor(s_soft_ns)).item())
-        source_soft_nc.append(torch.mean(torch.tensor(s_soft_nc)).item())
+            source_soft_ns.append(torch.mean(torch.tensor(s_soft_ns)).item())
+            source_soft_nc.append(torch.mean(torch.tensor(s_soft_nc)).item())
 
-        random_soft_ns.append(torch.mean(torch.tensor(r_soft_ns)).item())
-        random_soft_nc.append(torch.mean(torch.tensor(r_soft_nc)).item())
+            random_soft_ns.append(torch.mean(torch.tensor(r_soft_ns)).item())
+            random_soft_nc.append(torch.mean(torch.tensor(r_soft_nc)).item())
+        except:
+            continue
 
     soft_ns = torch.log(torch.mean(torch.tensor(source_soft_ns)) / torch.mean(torch.tensor(random_soft_ns)))
     soft_nc = torch.log(torch.mean(torch.tensor(source_soft_nc)) / torch.mean(torch.tensor(random_soft_nc)))
