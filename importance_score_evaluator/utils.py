@@ -140,7 +140,7 @@ def match_tokens_with_scores(scores, ranges):
         test.append(word_score)
     return torch.tensor(test)
 
-def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
+def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # Use single prompt instead of 11
     device = model.device
     inp = tokenizer(prompt*11, return_tensors='pt').to(device)
