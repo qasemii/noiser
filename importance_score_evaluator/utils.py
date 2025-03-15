@@ -166,7 +166,7 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
 
     k_list = []
-    for idx in len(inp['input_ids'][0]):
+    for idx in range(len(inp['input_ids'][0])):
         t_range = (idx, idx+1)
         b, e = idx, idx+1
         high = 1.0
@@ -188,7 +188,7 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
 
     min_k = min(k_list)
     print(min_k)
-    for idx in len(inp['input_ids'][0]):
+    for idx in range(len(inp['input_ids'][0])):
         t_range = (idx, idx+1)
         b, e = idx, idx+1
         with torch.no_grad():
