@@ -156,25 +156,19 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
     probs, preds = torch.max(probs, dim=-1, keepdim=True)  # Keep dims for consistency
     answer_id, base_score = (preds.squeeze(0).item(), probs.squeeze(0).item())
 
-
-    tokens = nltk.word_tokenize(prompt[0])
-    tokens = ['"' if token in ['``', "''"] else token for token in tokens]
-    tokens = check_whitespace(prompt[0], tokens)
-    tokens_range = collect_token_range(tokenizer, prompt[0], tokens)
-
-    # Initialize on correct device
-    tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
+    # tokens = nltk.word_tokenize(prompt[0])
+    # tokens = ['"' if token in ['``', "''"] else token for token in tokens]
+    # tokens = check_whitespace(prompt[0], tokens)
+    # tokens_range = collect_token_range(tokenizer, prompt[0], tokens)
 
     k_list = []
     for idx in range(len(inp['input_ids'][0])):
-        t_range = (idx, idx+1)
-        b, e = idx, idx+1
         high = 1.0
         low = 0.0
-        for _ in range(5):  # with 10 iteration the precision would be 2e-10 ~= 0.001
+        for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
             k = (low + high) / 2
             with torch.no_grad():
-                low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
+                low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
             prob = low_scores[answer_id].item()
 
             sorted_indices = torch.argsort(low_scores, descending=True)
@@ -187,17 +181,15 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
         k_list.append(k)
 
     min_k = min(k_list)
-    print(min_k)
+    # Initialize on correct device
+    tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
     for idx in range(len(inp['input_ids'][0])):
-        t_range = (idx, idx+1)
-        b, e = idx, idx+1
         with torch.no_grad():
-            low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
+            low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx,idx+1), scale=min_k)
         prob = low_scores[answer_id].item()
+        
         score = base_score - prob
-
-        # Assign score to all subword tokens in the range
-        tokens_score[b:e] = score
+        tokens_score[idx] = score
 
     # tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
