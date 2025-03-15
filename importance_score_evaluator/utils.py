@@ -166,8 +166,9 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
 
     k_list = []
-    for t_range in tokens_range:
-        b, e = t_range
+    for idx in len(inp['input_ids'][0]):
+        t_range = (idx, idx+1)
+        b, e = idx, idx+1
         high = 1.0
         low = 0.0
         for _ in range(5):  # with 10 iteration the precision would be 2e-10 ~= 0.001
@@ -187,8 +188,9 @@ def get_rationales(model, tokenizer, prompt, norm='inf', mode='prob'):
 
     min_k = min(k_list)
     print(min_k)
-    for t_range in tokens_range:
-        b, e = t_range
+    for idx in len(inp['input_ids'][0]):
+        t_range = (idx, idx+1)
+        b, e = idx, idx+1
         with torch.no_grad():
             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=t_range, scale=k)
         prob = low_scores[answer_id].item()
