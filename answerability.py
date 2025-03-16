@@ -32,9 +32,9 @@ from transformers import (
 
 device = "cuda"
 
-random.seed(42)
-torch.manual_seed(42)
-torch.use_deterministic_algorithms(True, warn_only=True)
+# random.seed(42)
+# torch.manual_seed(42)
+# torch.use_deterministic_algorithms(True, warn_only=True)
 
 
 def predict_token(model, tokenizer, prompt):
@@ -162,6 +162,14 @@ def main():
         "Tokens: {tokens}\n"
         "Probable Completion: "
     )
+
+    generation_configs = {
+        "temperature": 0.0,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "max_tokens": 200,
+    }
     
     answ_top1_rate = 0
     answ_top1_score = []
@@ -209,7 +217,7 @@ def main():
                 model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
                 messages=[{"role": "system", "content": INSTRUCTION},
                           {"role": "user",  "content": PROMPT.format(tokens=topk_words)}],
-                temperature=0.0
+                **generation_configs
             )
 
             prediction = response.choices[0].message.content
