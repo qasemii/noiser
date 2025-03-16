@@ -208,7 +208,7 @@ def main():
             tokens_range = collect_token_range(tokenizer, input_text, tokens)            
             scores = match_tokens_with_scores(scores.squeeze(), tokens_range)
 
-            k = int(np.ceil((args.topk/100) * len(tokens)))
+            k = int((args.topk/100) * len(tokens))
             topk_indices = torch.topk(scores, k=k).indices.sort().values
             topk_words = [tokens[i.item()] for i in topk_indices]
             topk_scores = torch.gather(scores, 0, topk_indices)
