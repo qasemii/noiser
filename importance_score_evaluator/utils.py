@@ -161,26 +161,26 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # tokens = check_whitespace(prompt[0], tokens)
     # tokens_range = collect_token_range(tokenizer, prompt[0], tokens)
 
-    # k_list = []
-    # for idx in range(len(inp['input_ids'][0])):
-    #     high = 1.0
-    #     low = 0.0
-    #     for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
-    #         k = (low + high) / 2
-    #         with torch.no_grad():
-    #             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
-    #         prob = low_scores[answer_id].item()
+    k_list = []
+    for idx in range(len(inp['input_ids'][0])):
+        high = 1.0
+        low = 0.0
+        for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
+            k = (low + high) / 2
+            with torch.no_grad():
+                low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
+            prob = low_scores[answer_id].item()
 
-    #         sorted_indices = torch.argsort(low_scores, descending=True)
-    #         rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
+            sorted_indices = torch.argsort(low_scores, descending=True)
+            rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
 
-    #         if rank == 0:
-    #             low = k
-    #         else:
-    #             high = k
-    #     k_list.append(k)
+            if rank == 0:
+                low = k
+            else:
+                high = k
+        k_list.append(k)
 
-    min_k = 0.001 #min(k_list)
+    min_k = min(k_list)
     # Initialize on correct device
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
     for idx in range(len(inp['input_ids'][0])):
