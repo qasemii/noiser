@@ -240,8 +240,9 @@ def main():
                 if data["target"] in prediction:
                     answ_top5_rate.append(1.0)
                     answ_top5_score.append(torch.sum(topk_scores).item())
+                    print(torch.sum(topk_scores).item())
                 else:
-                    answ_top1_rate.append(0.0)
+                    answ_top5_rate.append(0.0)
                     answ_top5_score.append(0.0)
             except:
                 pass
