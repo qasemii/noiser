@@ -171,10 +171,10 @@ def main():
         "max_tokens": 200,
     }
     
-    answ_top1_rate = 0
+    answ_top1_rate = []
     answ_top1_score = []
 
-    answ_top5_rate = 0
+    answ_top5_rate = []
     answ_top5_score = []
     print("Starting rationalization ...")
 
@@ -230,16 +230,18 @@ def main():
             try:
                 # Top-1
                 if prediction[0] == data["target"]:
-                    answ_top1_rate += 1
+                    answ_top1_rate.append(1.0)
                     answ_top1_score.append(torch.sum(topk_scores).item())
                 else:
+                    answ_top1_rate.append(0.0)
                     answ_top1_score.append(0.0)
 
                 # Top-5
                 if data["target"] in prediction:
-                    answ_top5_rate += 1
+                    answ_top5_rate.append(1.0)
                     answ_top5_score.append(torch.sum(topk_scores).item())
                 else:
+                    answ_top1_rate.append(0.0)
                     answ_top5_score.append(0.0)
             except:
                 pass
@@ -250,11 +252,11 @@ def main():
             # print(f"scores: {topk_scores}")
             # print(f'GPT prediction: {prediction}')
             # print("-"*10)
-    print(f"Rate: {answ_top1_rate/len(samples)}")
-    print(f"Score: {torch.mean(torch.tensor(answ_top1_score, dtype=torch.float16)).item()}")
+    print(f"Rate: {torch.mean(torch.tensor(answ_top1_rate, dtype=torch.float)).item()}")
+    print(f"Score: {torch.mean(torch.tensor(answ_top1_score, dtype=torch.float)).item()}")
     print()
-    print(f"Rate: {answ_top5_rate/len(samples)}")
-    print(f"Score: {torch.mean(torch.tensor(answ_top5_score, dtype=torch.float16)).item()}")
+    print(f"Rate: {torch.mean(torch.tensor(answ_top5_rate, dtype=torch.float)).item()}")
+    print(f"Score: {torch.mean(torch.tensor(answ_top5_score, dtype=torch.float)).item()}")
     
 
 
