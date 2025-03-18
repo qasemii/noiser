@@ -188,7 +188,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx,idx+1), scale=min_k)
         prob = low_scores[answer_id].item()
         
-        score = (base_score - prob) if base_score<prob else 0
+        score = (base_score - prob) if base_score>prob else 0
         tokens_score[idx] = score
 
     # remove negative score and normalize the summation
