@@ -188,12 +188,12 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx,idx+1), scale=min_k)
         prob = low_scores[answer_id].item()
         
-        score = base_score - prob
+        score = (base_score - prob) if base_score<prob else 0
         tokens_score[idx] = score
 
     # remove negative score and normalize the summation
-    if torch.any(tokens_score<0).item(): # check if there is any negative score
-        tokens_score = tokens_score - torch.min(tokens_score)
+    # if torch.any(tokens_score<0).item(): # check if there is any negative score
+    #     tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     return tokens_score.unsqueeze(0)
