@@ -142,7 +142,7 @@ def main():
 
     print("Starting rationalization ...")
     samples = dataset if args.n_samples == -1 else random.choices(dataset, k=args.n_samples)
-    for data in tqdm(samples):
+    for data in samples:
         # idx = data['id']
 
         input_ids = tokenizer(data["prompt"], return_tensors='pt')['input_ids'][0].to(device)
@@ -164,7 +164,7 @@ def main():
 
         try:
             score_map = torch.zeros([generated_ids.shape[0] - input_ids.shape[0], generated_ids.shape[0] - 1], device=device)
-            for target_pos in tqdm(torch.arange(input_ids.shape[0], generated_ids.shape[0])):
+            for target_pos in torch.arange(input_ids.shape[0], generated_ids.shape[0]):
                 input_ids = torch.unsqueeze(generated_ids[:target_pos], 0)
                 target_id = torch.unsqueeze(generated_ids[target_pos], 0)
 
