@@ -189,9 +189,6 @@ def main():
                                        pad_token_id=tokenizer.eos_token_id,
                                        max_new_tokens=args.max_new_tokens, 
                                        do_sample=False)[0]
-        
-        target_id = tokenizer(" "+data["target"], return_tensors='pt')['input_ids'][0].to(device)
-
         # Gemma and Llama add [bos] token which should be exclude from input prompt when
         for target_pos in torch.arange(input_ids.shape[0], generated_ids.shape[0]):
             input_ids = torch.unsqueeze(generated_ids[:target_pos], 0)
@@ -240,7 +237,6 @@ def main():
                 if data["target"] in prediction:
                     answ_top5_rate.append(1.0)
                     answ_top5_score.append(torch.sum(topk_scores).item())
-                    print(torch.sum(topk_scores).item())
                 else:
                     answ_top5_rate.append(0.0)
                     answ_top5_score.append(0.0)
