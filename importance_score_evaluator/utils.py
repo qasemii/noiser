@@ -169,8 +169,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
             k = (low + high) / 2
             with torch.no_grad():
                 low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
-            prob = low_scores[answer_id].item()
-
+            
             sorted_indices = torch.argsort(low_scores, descending=True)
             rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
 
