@@ -228,6 +228,7 @@ def main():
             prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
             try:
+                print(torch.sum(topk_scores).item())
                 # Top-1
                 if prediction[0] == data["target"]:
                     answ_top1_rate.append(1.0)
@@ -253,6 +254,7 @@ def main():
             # print(f"scores: {topk_scores}")
             # print(f'GPT prediction: {prediction}')
             # print("-"*10)
+    print()
     print(f"Rate: {torch.mean(torch.tensor(answ_top1_rate, dtype=torch.float)).item()}")
     print(f"Score: {torch.mean(torch.tensor(answ_top1_score, dtype=torch.float)).item()}")
     print()
