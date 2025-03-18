@@ -228,7 +228,6 @@ def main():
             prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
             try:
-                print(torch.sum(topk_scores).item())
                 # Top-1
                 if prediction[0] == data["target"]:
                     answ_top1_rate.append(1.0)
