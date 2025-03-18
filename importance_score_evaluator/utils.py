@@ -192,7 +192,8 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
         score = base_score - prob
         tokens_score[idx] = score
 
-    # tokens_score = tokens_score - torch.min(tokens_score)
+    # remove negative score and normalize the summation
+    tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     return tokens_score.unsqueeze(0)
