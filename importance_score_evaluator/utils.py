@@ -161,26 +161,27 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # tokens = check_whitespace(prompt[0], tokens)
     # tokens_range = collect_token_range(tokenizer, prompt[0], tokens)
 
-    k_list = []
-    for idx in range(len(inp['input_ids'][0])):
-        high = 1.0
-        low = 0.0
-        for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
-            k = (low + high) / 2
-            with torch.no_grad():
-                low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
+    # k_list = []
+    # for idx in range(len(inp['input_ids'][0])):
+    #     high = 1.0
+    #     low = 0.0
+    #     for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
+    #         k = (low + high) / 2
+    #         with torch.no_grad():
+    #             low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx, idx+1), scale=k)
             
-            sorted_indices = torch.argsort(low_scores, descending=True)
-            rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
+    #         sorted_indices = torch.argsort(low_scores, descending=True)
+    #         rank = (sorted_indices == answer_id).nonzero(as_tuple=True)[0].item()
 
-            if rank == 0:
-                low = k
-            else:
-                high = k
-        k_list.append(k)
+    #         if rank == 0:
+    #             low = k
+    #         else:
+    #             high = k
+    #     k_list.append(k)
 
-    min_k = min(k_list)
-    print(min_k)
+    # min_k = min(k_list)
+    # print(min_k)
+    min_k=1
     # Initialize on correct device
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
     for idx in range(len(inp['input_ids'][0])):
@@ -195,6 +196,9 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # remove negative score and normalize the summation
     # if torch.any(tokens_score<0).item(): # check if there is any negative score
     #     tokens_score = tokens_score - torch.min(tokens_score)
+
+    if torch.sum(tokens_score).item(): # check if there is any negative score
+        tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     return tokens_score.unsqueeze(0)
