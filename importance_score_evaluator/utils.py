@@ -197,7 +197,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # if torch.any(tokens_score<0).item(): # check if there is any negative score
     #     tokens_score = tokens_score - torch.min(tokens_score)
 
-    if torch.sum(tokens_score).item(): # check if there is any negative score
+    if torch.sum(tokens_score).item()<0: # check if there is any negative score
         print(f"Score sum is negative: {torch.sum(tokens_score).item()}")
         tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
