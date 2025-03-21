@@ -162,7 +162,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # tokens_range = collect_token_range(tokenizer, prompt[0], tokens)
 
     # k_list = []
-    # for idx in range(len(inp['input_ids'][0])):
+    # for idx in tqdm(range(len(inp['input_ids'][0]))):
     #     high = 1.0
     #     low = 0.0
     #     for _ in range(10):  # with 10 iteration the precision would be 2e-10 ~= 0.001
@@ -181,7 +181,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
 
     # min_k = min(k_list)
     # print(min_k)
-    min_k=1
+    min_k=1 
     # Initialize on correct device
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
     for idx in range(len(inp['input_ids'][0])):
@@ -197,8 +197,8 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # if torch.any(tokens_score<0).item(): # check if there is any negative score
     #     tokens_score = tokens_score - torch.min(tokens_score)
 
-    if torch.sum(tokens_score).item(): # check if there is any negative score
-        tokens_score = tokens_score - torch.min(tokens_score)
+    # if torch.sum(tokens_score).item(): # check if there is any negative score
+    #     tokens_score = tokens_score - torch.min(tokens_score)
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     return tokens_score.unsqueeze(0)
