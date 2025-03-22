@@ -179,7 +179,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     #             high = k
     #     k_list.append(k)
 
-    min_k = random.random() #min(k_list)
+    min_k = 1#min(k_list)
     # print(min_k)
     # Initialize on correct device
     tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
