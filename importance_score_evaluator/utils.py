@@ -179,14 +179,13 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
                 high = k
         k_list.append(k)
 
-    # min_k = min(k_list)
-    # print(min_k)
-    
-    # # Initialize on correct device
-    # tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
-    # for idx in range(len(inp['input_ids'][0])):
-    #     with torch.no_grad():
-    #         low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx,idx+1), scale=min_k)
+    min_k = min(k_list)
+    print(min_k)
+    # Initialize on correct device
+    tokens_score = torch.zeros(len(inp['input_ids'][0]), device=device)
+    for idx in range(len(inp['input_ids'][0])):
+        with torch.no_grad():
+            low_scores = make_noisy_embeddings(model, inp, norm=norm, tokens_to_mix=(idx,idx+1), scale=min_k)
         prob = low_scores[answer_id].item()
         
         score = base_score - prob
@@ -196,11 +195,7 @@ def get_rationales(model, tokenizer, prompt, norm='None', mode='prob'):
     # remove negative score and normalize the summation
     # if torch.any(tokens_score<0).item(): # check if there is any negative score
     #     tokens_score = tokens_score - torch.min(tokens_score)
-
-    if torch.sum(tokens_score).item(): # check if there is any negative score
-        print(f"Score sum is negative: {torch.sum(tokens_score).item()}")
-        tokens_score = tokens_score - torch.min(tokens_score)
-        
+    
     tokens_score = tokens_score / torch.sum(tokens_score)
 
     return tokens_score.unsqueeze(0)
