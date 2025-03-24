@@ -171,6 +171,7 @@ def main():
     }
     
     min_k_list = []
+    min_s_list = []
     print("Starting rationalization ...")
 
     samples = dataset if args.n_samples == -1 else random.choices(dataset, k=args.n_samples)
@@ -204,6 +205,7 @@ def main():
             for k in range(len(tokens)-1,0,-1):
                 
                 topk_indices = torch.topk(scores, k=k).indices.sort().values
+                topk_scores = torch.gather(scores, 0, topk_indices)
                 topk_words = [tokens[i.item()] for i in topk_indices]
 
                 response = client.chat.completions.create(
@@ -222,6 +224,8 @@ def main():
                 # Top-1
                 if prediction[0] != data["target"]:
                     min_k_list.append(k/len(tokens))
+                    min_s_list.append(torch.sum(topk_scores).item())
+                    
                     success = True
                     break
             if success==False:
@@ -235,6 +239,7 @@ def main():
             # print("-"*10)
     print()
     print(f"Rate: {torch.mean(torch.tensor(min_k_list, dtype=torch.float)).item()}")
+    print(f"Score: {torch.mean(torch.tensor(min_s_list, dtype=torch.float)).item()}")
 
 
 
