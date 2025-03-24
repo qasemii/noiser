@@ -202,7 +202,7 @@ def main():
             scores = match_tokens_with_scores(scores.squeeze(), tokens_range)
 
             success = False
-            for k in range(len(tokens)):
+            for k in range(len(tokens)-1,0,-1):
                 
                 topk_indices = torch.topk(scores, k=k).indices.sort().values
                 topk_words = [tokens[i.item()] for i in topk_indices]
@@ -215,14 +215,13 @@ def main():
                 )
 
                 prediction = response.choices[0].message.content
-
                 ## Uncomment the following if using GPT-4o
                 # prediction = [word.strip(" '") for word in prediction.split(",")]
                 ## Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
                 prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
                 # Top-1
-                if prediction[0] == data["target"]:
+                if prediction[0] != data["target"]:
                     min_k_list.append(k/len(tokens))
                     success = True
                     break
@@ -237,11 +236,7 @@ def main():
             # print("-"*10)
     print()
     print(f"Rate: {torch.mean(torch.tensor(min_k_list, dtype=torch.float)).item()}")
-    print(f"Score: {torch.mean(torch.tensor(answ_top1_score, dtype=torch.float)).item()}")
-    print()
-    print(f"Rate: {torch.mean(torch.tensor(answ_top5_rate, dtype=torch.float)).item()}")
-    print(f"Score: {torch.mean(torch.tensor(answ_top5_score, dtype=torch.float)).item()}")
-    
+
 
 
 
