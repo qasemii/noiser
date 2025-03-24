@@ -221,13 +221,16 @@ def main():
                 ## Uncomment the following if using meta-llama/Llama-3.3-70B-Instruct-Turbo
                 prediction = re.findall(r'\b[A-Za-z]+\b', prediction)
 
-                # Top-1
-                if prediction[0] != data["target"]:
-                    min_k_list.append(k/len(tokens))
-                    min_s_list.append(torch.sum(topk_scores).item())
-                    
-                    success = True
-                    break
+                try:
+                    # Top-1
+                    if prediction[0] != data["target"]:
+                        min_k_list.append(k/len(tokens))
+                        min_s_list.append(torch.sum(topk_scores).item())
+                        
+                        success = True
+                        break
+                except:
+                    pass
             if success==False:
                 min_k_list.append(1.0)
 
