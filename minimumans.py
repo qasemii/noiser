@@ -233,6 +233,7 @@ def main():
                     pass
             if success==False:
                 min_k_list.append(1.0)
+                min_s_list.append(0.0)
 
             # # compute metrics on Soft-NS and Soft-NC
             # print(f"Prompt: {data['prompt']}")
