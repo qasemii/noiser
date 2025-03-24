@@ -67,7 +67,6 @@ def main():
        help="noiser, attention, attention_last, attention_rollout, gradient_shap,\
              input_x_gradient, integrated_gradients, lime, reagent, occlusion")  
     aa("--openai_api_key", type=str, default=None)
-    aa("--topk", type=int, default=50)
     
     args = parser.parse_args()
 
